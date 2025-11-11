@@ -1,1 +1,206 @@
+/* 1. Reset Dasar & Font */
+body {
+    font-family: 'Poppins', sans-serif; /* Menggunakan font modern */
+    margin: 0;
+    padding: 0;
+    background-color: #f8fcf9; /* Latar belakang sangat terang */
+    color: #2c3e50; /* Warna teks gelap kebiruan */
+}
 
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+/* 2. Header & Navigasi */
+header {
+    background-color: #5cb85c; /* Hijau Segar */
+    color: white;
+    padding: 15px 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8em;
+    letter-spacing: 1px;
+}
+
+nav {
+    margin-top: 10px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+nav a:hover {
+    background-color: #4cae4c; /* Sedikit lebih gelap saat hover */
+}
+
+/* 3. Bagian Produk */
+#produk {
+    text-align: center;
+    padding: 40px 0;
+}
+
+#produk h2 {
+    color: #e74c3c; /* Merah untuk judul produk */
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+.produk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.produk-item {
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+}
+
+.produk-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.produk-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.produk-item h3 {
+    padding: 10px 0 5px;
+    margin: 0;
+}
+
+.harga {
+    color: #f39c12; /* Kuning/Oranye cerah untuk harga */
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 5px 0 15px;
+}
+
+/* Tombol Aksi */
+.produk-item button {
+    background-color: #f39c12;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 0 0 12px 12px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+.produk-item button:hover {
+    background-color: #e67e22;
+}
+
+/* 4. Bagian Checkout & Pembayaran */
+#checkout {
+    background-color: #ecf0f1; /* Latar belakang abu-abu muda */
+    padding: 40px;
+    margin: 40px 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+#checkout h2 {
+    color: #2980b9; /* Biru untuk judul checkout */
+}
+
+.keranjang-info {
+    margin-bottom: 25px;
+    padding: 20px;
+    border: 2px dashed #bdc3c7;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+/* Styling Opsi Pembayaran */
+#pembayaran-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.pilihan-pembayaran {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.pilihan-pembayaran:has(input:checked) {
+    background-color: #eaf6ff; /* Latar belakang biru muda saat dipilih */
+    border-color: #2980b9;
+    font-weight: 600;
+}
+
+.pilihan-pembayaran label {
+    display: inline-block;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+
+.pilihan-pembayaran input[type="radio"] {
+    transform: scale(1.2);
+    margin-right: 15px;
+}
+
+.detail-bayar {
+    margin-top: 15px;
+    padding: 15px;
+    border-left: 5px solid #5cb85c;
+    background-color: #f0fff0; /* Hijau sangat muda */
+    border-radius: 4px;
+    font-size: 0.95em;
+    color: #27ae60;
+}
+
+.tombol-bayar {
+    margin-top: 25px;
+    width: 100%;
+    padding: 18px;
+    font-size: 1.2em;
+    background-color: #27ae60; /* Hijau kuat */
+    border-radius: 8px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.tombol-bayar:hover {
+    background-color: #2ecc71;
+}
+
+/* 5. Footer */
+footer {
+    text-align: center;
+    padding: 25px 0;
+    background-color: #34495e; /* Biru tua elegan */
+    color: white;
+    margin-top: 30px;
+    font-size: 0.9em;
+}
