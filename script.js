@@ -1,149 +1,189 @@
-document.addEventListener('DOMContentLoaded', function() {
-
-    // --- 1. Selektor Elemen Penting ---
-    const productItems = document.querySelectorAll('.produk-item');
-    const paymentRadios = document.querySelectorAll('input[name="metode_bayar"]');
+document.addEventListener('DOMContentLoaded', () => {
+    // === DOM Elements ===
+    const radioButtons = document.querySelectorAll('input[name="metode_bayar"]');
     const detailContainers = document.querySelectorAll('.detail-bayar');
-    const totalDisplay = document.querySelector('.keranjang-info p');
-    const checkoutForm = document.getElementById('pembayaran-form');
+    const tambahKeranjangButtons = document.querySelectorAll('.tambah-keranjang');
+    const daftarKeranjang = document.getElementById('daftar-keranjang');
+    const totalBelanjaSpan = document.getElementById('total-belanja');
+    const ongkirSpan = document.getElementById('ongkir');
+    const grandTotalSpan = document.getElementById('grand-total');
+    const pembayaranForm = document.getElementById('pembayaran-form');
+    const checkoutButton = document.getElementById('checkout-button');
+    const peringatanKeranjang = document.getElementById('peringatan-keranjang');
+    
+    // === State Keranjang ===
+    let keranjang = [];
+    const ONGKIR_STANDAR = 10000;
+    const BIAYA_COD = 5000;
 
-    // --- 2. Variabel Status (Simulasi Keranjang) ---
-    let cart = [];
-    let totalPrice = 0;
-
-    // Data produk (Simulasi) - PASTIKAN NAMA PRODUK DI SINI SAMA PERSIS DENGAN YANG ADA DI ELEMEN <h3> HTML
-    const productsData = {
-        'Apel Fuji Premium': 35000,
-        'Pisang Cavendish': 20000,
-        'Mangga Harum Manis': 45000, // Tambahan produk simulasi
-        'Jeruk Sunkist': 28000 // Tambahan produk simulasi
-    };
-
-    // --- 3. Fungsi Logika Keranjang ---
-
-    function updateCartDisplay() {
-        // Hitung ulang total harga berdasarkan item dan kuantitas di keranjang
-        totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        
-        // Format harga ke mata uang Rupiah
-        const formattedTotal = new Intl.NumberFormat('id-ID', {
+    // === Fungsi Utilitas ===
+    const formatRupiah = (number) => {
+        return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
             minimumFractionDigits: 0
-        }).format(totalPrice);
-        
-        // Perbarui tampilan total belanja
-        totalDisplay.innerHTML = `Total Belanja (Simulasi): <strong>${formattedTotal}</strong>`;
-        
-        console.log('Keranjang saat ini:', cart);
-        console.log('Total Harga:', formattedTotal);
-    }
+        }).format(number);
+    };
 
-    // Event Listener untuk tombol "Tambah ke Keranjang"
-    productItems.forEach(item => {
-        const addButton = item.querySelector('button');
-        // Mendapatkan nama produk dari elemen <h3>
-        const productName = item.querySelector('h3').textContent.trim();
-        // Mengambil harga dari objek productsData
-        const productPrice = productsData[productName];
-
-        // Memastikan produk ada di data simulasi dan memiliki tombol
-        if (productPrice !== undefined && addButton) { 
-            addButton.addEventListener('click', () => {
-                // Cari apakah produk sudah ada di keranjang
-                const existingItem = cart.find(item => item.name === productName);
-
-                if (existingItem) {
-                    existingItem.quantity += 1;
-                } else {
-                    // Tambahkan produk baru ke keranjang
-                    cart.push({ name: productName, price: productPrice, quantity: 1 });
-                }
-
-                alert(`${productName} berhasil ditambahkan ke keranjang!`);
-                updateCartDisplay(); // Panggil fungsi untuk memperbarui total
-            });
-        } else {
-            // Log jika ada item di HTML yang tidak memiliki data harga
-            console.error(`Produk "${productName}" tidak ditemukan di productsData atau tombol tidak ditemukan.`);
-        }
-    });
-
-    // Inisialisasi tampilan keranjang awal
-    updateCartDisplay();
-
-
-    // --- 4. Fungsi Interaktif Pilihan Pembayaran ---
+    // === Fungsi Pembayaran (Logika Awal Anda) ===
 
     // Fungsi untuk menyembunyikan semua detail pembayaran
-    function hideAllDetails() {
-        detailContainers.forEach(detail => {
-            detail.style.display = 'none';
-        });
-    }
+    const hideAllDetails = () => {
+        detailContainers.forEach(detail => detail.style.display = 'none');
+    };
 
-    // Event Listener untuk radio button pembayaran
-    paymentRadios.forEach(radio => {
+    // Tampilkan detail saat radio button dipilih
+    radioButtons.forEach(radio => {
         radio.addEventListener('change', (event) => {
-            hideAllDetails(); // Sembunyikan semua detail terlebih dahulu
-            const selectedValue = event.target.value;
-            // Temukan dan tampilkan detail yang sesuai
-            const detailElement = document.querySelector(`.${selectedValue}-detail`);
+            hideAllDetails();
+            const value = event.target.value;
+            const detailElement = document.querySelector(`.${value}-detail`);
             if (detailElement) {
                 detailElement.style.display = 'block';
             }
+            updateGrandTotal(); // Panggil ini karena COD ada biaya tambahan
         });
     });
 
-    // Panggil fungsi ini saat script dimuat agar detail tersembunyi
+    // Sembunyikan semua saat halaman dimuat
     hideAllDetails();
 
-    // --- 5. Simulasi Proses Checkout (Form Submit) ---
+    // === Fungsi Keranjang ===
 
-    checkoutForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Mencegah form melakukan submit default (reload halaman)
+    // Menghitung dan memperbarui total
+    const hitungTotal = () => {
+        let subtotal = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+        let ongkosKirim = ONGKIR_STANDAR;
+        let metodeBayarTerpilih = document.querySelector('input[name="metode_bayar"]:checked')?.value;
+        let biayaTambahan = 0;
 
-        const selectedMethod = document.querySelector('input[name="metode_bayar"]:checked');
-        
-        // Validasi keranjang kosong
-        if (totalPrice === 0) {
-             alert('Keranjang belanja Anda masih kosong. Silakan tambahkan buah!');
-             return;
+        if (metodeBayarTerpilih === 'cod') {
+            biayaTambahan = BIAYA_COD;
         }
 
-        // Validasi metode pembayaran
-        if (!selectedMethod) {
-            alert('Mohon pilih salah satu metode pembayaran (E-Wallet, Transfer Bank, atau COD).');
+        let grandTotal = subtotal + ongkosKirim + biayaTambahan;
+
+        // Update DOM
+        totalBelanjaSpan.textContent = formatRupiah(subtotal);
+        ongkirSpan.textContent = formatRupiah(ongkosKirim);
+        grandTotalSpan.textContent = formatRupiah(grandTotal);
+        
+        // Aktifkan/nonaktifkan tombol checkout
+        const isKeranjangEmpty = keranjang.length === 0;
+        checkoutButton.disabled = isKeranjangEmpty;
+        peringatanKeranjang.style.display = isKeranjangEmpty ? 'block' : 'none';
+        
+        return { subtotal, grandTotal };
+    };
+
+    const updateGrandTotal = () => {
+         hitungTotal(); // Hanya panggil untuk update tampilan total
+    }
+
+    // Merender ulang daftar keranjang
+    const renderKeranjang = () => {
+        daftarKeranjang.innerHTML = '';
+
+        if (keranjang.length === 0) {
+            const li = document.createElement('li');
+            li.textContent = "Keranjang Anda kosong.";
+            daftarKeranjang.appendChild(li);
+        } else {
+            keranjang.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${item.nama} (x${item.qty})</span>
+                    <span>${formatRupiah(item.harga * item.qty)} 
+                        <button class="remove-item" data-id="${item.id}" data-qty="1">Hapus 1</button>
+                        <button class="remove-item-all" data-id="${item.id}">Hapus Semua</button>
+                    </span>
+                `;
+                daftarKeranjang.appendChild(li);
+            });
+        }
+        
+        hitungTotal();
+    };
+
+    // Menangani klik tombol "Tambah ke Keranjang"
+    tambahKeranjangButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const id = event.target.dataset.id;
+            const nama = event.target.dataset.nama;
+            const harga = parseInt(event.target.dataset.harga);
+
+            const existingItem = keranjang.find(item => item.id === id);
+
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                keranjang.push({ id, nama, harga, qty: 1 });
+            }
+
+            renderKeranjang();
+            alert(`${nama} ditambahkan ke keranjang!`);
+        });
+    });
+    
+    // Menangani klik tombol "Hapus" pada keranjang
+    daftarKeranjang.addEventListener('click', (event) => {
+        if (event.target.classList.contains('remove-item')) {
+            const id = event.target.dataset.id;
+            const itemIndex = keranjang.findIndex(item => item.id === id);
+
+            if (itemIndex > -1) {
+                keranjang[itemIndex].qty -= 1;
+                if (keranjang[itemIndex].qty <= 0) {
+                    keranjang.splice(itemIndex, 1); // Hapus jika qty = 0
+                }
+                renderKeranjang();
+            }
+        }
+        
+        if (event.target.classList.contains('remove-item-all')) {
+            const id = event.target.dataset.id;
+            const itemIndex = keranjang.findIndex(item => item.id === id);
+
+            if (itemIndex > -1) {
+                keranjang.splice(itemIndex, 1); // Hapus semua
+                renderKeranjang();
+            }
+        }
+    });
+
+    // === Form Submission ===
+    pembayaranForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        
+        if (keranjang.length === 0) {
+            alert("Keranjang belanja masih kosong!");
             return;
         }
 
-        const method = selectedMethod.value.toUpperCase();
+        const formData = new FormData(pembayaranForm);
+        const data = Object.fromEntries(formData.entries());
+        const { grandTotal } = hitungTotal();
 
-        // Ambil total harga yang sudah terformat dari tampilan
-        const finalTotalDisplay = totalDisplay.querySelector('strong').textContent;
-
-        // Tampilkan pesan sukses berdasarkan metode yang dipilih
-        let successMessage = `Pesanan Anda telah berhasil dibuat!\n`;
-        successMessage += `Total yang harus dibayar: ${finalTotalDisplay}.\n\n`;
-
-        switch (method) {
-            case 'EWALLET':
-                successMessage += `Langkah selanjutnya: Anda akan diarahkan ke halaman gerbang pembayaran E-Wallet (simulasi).`;
-                break;
-            case 'TRANSFER':
-                successMessage += `Langkah selanjutnya: Silakan lakukan Transfer Bank dan kirimkan bukti pembayaran.`;
-                break;
-            case 'COD':
-                successMessage += `Langkah selanjutnya: Kami akan segera memproses pengiriman. Siapkan uang tunai saat kurir tiba!`;
-                break;
-            default:
-                successMessage += `Langkah selanjutnya: Pesanan sedang diproses.`;
-        }
-
-        alert(successMessage);
+        // Gabungkan data
+        const dataPemesanan = {
+            ...data,
+            keranjang: keranjang,
+            total_bayar: grandTotal,
+            total_rupiah: formatRupiah(grandTotal)
+        };
         
-        // Reset keranjang setelah simulasi checkout
-        cart = [];
-        updateCartDisplay(); // Perbarui total menjadi nol
+        // Simulasikan proses checkout berhasil
+        console.log("Data Pemesanan:", dataPemesanan);
+
+        alert(`Pemesanan Berhasil!\nTotal yang harus dibayar: ${dataPemesanan.total_rupiah}\nMetode: ${dataPemesanan.metode_bayar.toUpperCase()}\nTerima kasih, ${dataPemesanan.nama}!`);
+
+        // Reset setelah checkout berhasil (opsional)
+        keranjang = [];
+        renderKeranjang();
+        pembayaranForm.reset();
+        hideAllDetails();
     });
+
+    // Inisialisasi tampilan keranjang
+    renderKeranjang();
 });
