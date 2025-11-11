@@ -1,1 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Buah Segar Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+    <header>
+        <h1>Toko Buah Segar 🛒</h1>
+        <nav>
+            <a href="#produk">Produk</a>
+            <a href="#cara-pesan">Cara Pesan</a>
+            <a href="#kontak">Kontak</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="produk" class="container">
+            <h2>Buah Segar Pilihan</h2>
+            <div class="produk-grid">
+                <div class="produk-item">
+                    <img src="https://via.placeholder.com/300x200?text=Apel+Fuji" alt="Apel Fuji">
+                    <h3>Apel Fuji Premium</h3>
+                    <p class="harga">Rp 35.000 / kg</p>
+                    <button>Tambah ke Keranjang</button>
+                </div>
+                <div class="produk-item">
+                    <img src="https://via.placeholder.com/300x200?text=Pisang+Cavendish" alt="Pisang Cavendish">
+                    <h3>Pisang Cavendish</h3>
+                    <p class="harga">Rp 20.000 / sisir</p>
+                    <button>Tambah ke Keranjang</button>
+                </div>
+                </div>
+        </section>
+        
+        <hr>
+
+        <section id="checkout" class="container">
+            <h2>Keranjang & Checkout</h2>
+            <div class="keranjang-info">
+                <p>Total Belanja (Simulasi): **Rp 55.000**</p>
+                <form id="pembayaran-form">
+                    <h3>Pilih Metode Pembayaran</h3>
+                    
+                    <div class="pilihan-pembayaran">
+                        <input type="radio" id="ewallet" name="metode_bayar" value="ewallet" required>
+                        <label for="ewallet">💳 E-Wallet (Gopay, OVO, Dana)</label>
+                        <div class="detail-bayar ewallet-detail">
+                            <p>Pembayaran akan diarahkan ke aplikasi E-Wallet setelah klik 'Bayar Sekarang'.</p>
+                        </div>
+                    </div>
+
+                    <div class="pilihan-pembayaran">
+                        <input type="radio" id="transfer" name="metode_bayar" value="transfer">
+                        <label for="transfer">🏦 Transfer Bank (BCA, Mandiri, BRI)</label>
+                        <div class="detail-bayar transfer-detail">
+                            <p>Transfer ke Rekening **BCA 1234567890** a.n. Toko Buah Segar. Kirim bukti transfer setelahnya.</p>
+                        </div>
+                    </div>
+
+                    <div class="pilihan-pembayaran">
+                        <input type="radio" id="cod" name="metode_bayar" value="cod">
+                        <label for="cod">💵 Cash On Delivery (COD)</label>
+                        <div class="detail-bayar cod-detail">
+                            <p>**Bayar tunai** saat buah diterima. Berlaku untuk area tertentu.</p>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="tombol-bayar">Bayar Sekarang</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <footer id="kontak">
+        <p>&copy; 2025 Toko Buah Segar Online. | Hubungi Kami: 0812-3456-7890</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const radioButtons = document.querySelectorAll('input[name="metode_bayar"]');
+            const detailContainers = document.querySelectorAll('.detail-bayar');
+
+            // Fungsi untuk menyembunyikan semua detail
+            const hideAllDetails = () => {
+                detailContainers.forEach(detail => detail.style.display = 'none');
+            };
+
+            // Tampilkan detail saat radio button dipilih
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', (event) => {
+                    hideAllDetails();
+                    const value = event.target.value;
+                    const detailElement = document.querySelector(`.${value}-detail`);
+                    if (detailElement) {
+                        detailElement.style.display = 'block';
+                    }
+                });
+            });
+
+            // Sembunyikan semua saat halaman dimuat
+            hideAllDetails();
+        });
+    </script>
+</body>
+</html>
