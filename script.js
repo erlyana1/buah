@@ -11,6 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutButton = document.getElementById('checkout-button');
     const peringatanKeranjang = document.getElementById('peringatan-keranjang');
     
+    // Nomor WhatsApp tujuan
+    // Telah disetel ke 6285692128064 sesuai permintaan.
+    const WHATSAPP_NUMBER = '6285692128064'; 
+    
     // === State Keranjang ===
     let keranjang = [];
     const ONGKIR_STANDAR = 10000;
@@ -24,8 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
             minimumFractionDigits: 0
         }).format(number);
     };
-
-    // === Fungsi Pembayaran (Logika Awal Anda) ===
 
     // Fungsi untuk menyembunyikan semua detail pembayaran
     const hideAllDetails = () => {
@@ -41,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (detailElement) {
                 detailElement.style.display = 'block';
             }
-            updateGrandTotal(); // Panggil ini karena COD ada biaya tambahan
+            updateGrandTotal();
         });
     });
 
@@ -73,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         checkoutButton.disabled = isKeranjangEmpty;
         peringatanKeranjang.style.display = isKeranjangEmpty ? 'block' : 'none';
         
-        return { subtotal, grandTotal };
+        return { subtotal, grandTotal, ongkosKirim, biayaTambahan };
     };
 
     const updateGrandTotal = () => {
@@ -121,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             renderKeranjang();
-            alert(`${nama} ditambahkan ke keranjang!`);
+            // Notifikasi penambahan produk dihilangkan agar tidak mengganggu
         });
     });
     
@@ -151,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // === Form Submission ===
+    // === Form Submission (Pengiriman WhatsApp) ===
     pembayaranForm.addEventListener('submit', (event) => {
         event.preventDefault();
         
@@ -159,29 +161,55 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Keranjang belanja masih kosong!");
             return;
         }
-
+        
+        // 1. Ambil data form dan total
         const formData = new FormData(pembayaranForm);
         const data = Object.fromEntries(formData.entries());
-        const { grandTotal } = hitungTotal();
-
-        // Gabungkan data
-        const dataPemesanan = {
-            ...data,
-            keranjang: keranjang,
-            total_bayar: grandTotal,
-            total_rupiah: formatRupiah(grandTotal)
-        };
+        const { grandTotal, subtotal, ongkosKirim, biayaTambahan } = hitungTotal();
         
-        // Simulasikan proses checkout berhasil
-        console.log("Data Pemesanan:", dataPemesanan);
+        // Ambil label pembayaran yang dipilih (misal: "💳 E-Wallet...")
+        const metodeBayarLabelElement = document.querySelector(`input[name="metode_bayar"][value="${data.metode_bayar}"] + label`);
+        const metodeBayarLabel = metodeBayarLabelElement ? metodeBayarLabelElement.textContent.trim() : data.metode_bayar.toUpperCase();
 
-        alert(`Pemesanan Berhasil!\nTotal yang harus dibayar: ${dataPemesanan.total_rupiah}\nMetode: ${dataPemesanan.metode_bayar.toUpperCase()}\nTerima kasih, ${dataPemesanan.nama}!`);
 
-        // Reset setelah checkout berhasil (opsional)
-        keranjang = [];
-        renderKeranjang();
-        pembayaranForm.reset();
-        hideAllDetails();
+        // 2. Buat Teks Pesan
+        let pesan = `*Pemesanan Buah Segar Baru*\n\n`;
+        pesan += `*Nama:* ${data.nama}\n`;
+        pesan += `*Telepon:* ${data.telepon}\n`;
+        pesan += `*Alamat Pengiriman:* ${data.alamat}\n\n`;
+        
+        pesan += `*Detail Pesanan:*\n`;
+        keranjang.forEach((item, index) => {
+            pesan += `${index + 1}. ${item.nama} (x${item.qty}) - ${formatRupiah(item.harga * item.qty)}\n`;
+        });
+        
+        pesan += `\n--- Rincian Biaya ---\n`;
+        pesan += `Subtotal: ${formatRupiah(subtotal)}\n`;
+        pesan += `Ongkir: ${formatRupiah(ongkosKirim)}\n`;
+        if (biayaTambahan > 0) {
+            pesan += `Biaya Tambahan (COD): ${formatRupiah(biayaTambahan)}\n`;
+        }
+        pesan += `*Total Bayar: ${formatRupiah(grandTotal)}*\n\n`;
+        pesan += `*Metode Pembayaran:* ${metodeBayarLabel}\n\n`;
+        pesan += `Mohon konfirmasi pesanan ini. Terima kasih!`;
+
+        // 3. Format URL WhatsApp
+        const encodedPesan = encodeURIComponent(pesan);
+        const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedPesan}`;
+
+        // 4. Redirect ke WhatsApp
+        window.open(whatsappURL, '_blank');
+        
+        // Opsional: Reset form dan keranjang setelah redirect
+        setTimeout(() => {
+            // Tampilkan pesan sukses sebelum reset
+            alert("Pemesanan berhasil! Anda akan diarahkan ke WhatsApp untuk konfirmasi dan pembayaran. Tekan kirim di WhatsApp.");
+            
+            keranjang = [];
+            renderKeranjang();
+            pembayaranForm.reset();
+            hideAllDetails();
+        }, 100); 
     });
 
     // Inisialisasi tampilan keranjang
