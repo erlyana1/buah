@@ -3,46 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Toko Buah Segar Online</title>
+    <title>Toko Buah Segar Online | Checkout</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
-        <h1>Toko Buah Segar 🛒</h1>
-        <nav>
-            <a href="#produk">Produk</a>
-            <a href="#cara-pesan">Cara Pesan</a>
-            <a href="#kontak">Kontak</a>
-        </nav>
+        <div class="container header-content">
+            <h1>Toko Buah Segar 🛒</h1>
+            <nav>
+                <a href="#produk">Produk</a>
+                <a href="#cara-pesan">Cara Pesan</a>
+                <a href="#kontak">Kontak</a>
+            </nav>
+        </div>
     </header>
 
     <main>
         <section id="produk" class="container">
-            <h2>Buah Segar Pilihan</h2>
+            <h2>Buah Segar Pilihan 🍎🍌</h2>
             <div class="produk-grid">
                 <div class="produk-item">
                     <img src="https://via.placeholder.com/300x200?text=Apel+Fuji" alt="Apel Fuji">
                     <h3>Apel Fuji Premium</h3>
-                    <p class="harga">Rp 35.000 / kg</p>
-                    <button>Tambah ke Keranjang</button>
+                    <p class="deskripsi">Manis renyah, kualitas impor terbaik.</p>
+                    <p class="harga" data-price="35000">Rp 35.000 / kg</p>
+                    <button class="tambah-keranjang" data-id="1" data-nama="Apel Fuji Premium" data-harga="35000">Tambah ke Keranjang</button>
                 </div>
                 <div class="produk-item">
                     <img src="https://via.placeholder.com/300x200?text=Pisang+Cavendish" alt="Pisang Cavendish">
                     <h3>Pisang Cavendish</h3>
-                    <p class="harga">Rp 20.000 / sisir</p>
-                    <button>Tambah ke Keranjang</button>
+                    <p class="deskripsi">Kaya energi, cocok untuk segala usia.</p>
+                    <p class="harga" data-price="20000">Rp 20.000 / sisir</p>
+                    <button class="tambah-keranjang" data-id="2" data-nama="Pisang Cavendish" data-harga="20000">Tambah ke Keranjang</button>
                 </div>
+                <div class="produk-item">
+                    <img src="https://via.placeholder.com/300x200?text=Jeruk+Sunkist" alt="Jeruk Sunkist">
+                    <h3>Jeruk Sunkist</h3>
+                    <p class="deskripsi">Segar dan kaya Vitamin C.</p>
+                    <p class="harga" data-price="25000">Rp 25.000 / kg</p>
+                    <button class="tambah-keranjang" data-id="3" data-nama="Jeruk Sunkist" data-harga="25000">Tambah ke Keranjang</button>
                 </div>
+            </div>
         </section>
         
         <hr>
 
         <section id="checkout" class="container">
-            <h2>Keranjang & Checkout</h2>
-            <div class="keranjang-info">
-                <p>Total Belanja (Simulasi): **Rp 55.000**</p>
+            <h2>Keranjang & Checkout 🧺</h2>
+            <div class="checkout-content">
+                
+                <div class="keranjang-detail">
+                    <h3>Daftar Belanja Anda</h3>
+                    <ul id="daftar-keranjang">
+                        </ul>
+                    <p class="keranjang-total">Total Belanja: <span id="total-belanja">Rp 0</span></p>
+                    <p class="keranjang-total">Ongkos Kirim: <span id="ongkir">Rp 10.000</span></p>
+                    <p class="grand-total">**Total Bayar:** <span id="grand-total">**Rp 10.000**</span></p>
+                </div>
+
                 <form id="pembayaran-form">
+                    <h3>Informasi Pengiriman</h3>
+                    <div class="form-group">
+                        <label for="nama">Nama Lengkap</label>
+                        <input type="text" id="nama" name="nama" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="alamat">Alamat Lengkap</label>
+                        <textarea id="alamat" name="alamat" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="telepon">Nomor Telepon</label>
+                        <input type="tel" id="telepon" name="telepon" required>
+                    </div>
+
+                    <hr>
+
                     <h3>Pilih Metode Pembayaran</h3>
                     
                     <div class="pilihan-pembayaran">
@@ -65,51 +101,36 @@
                         <input type="radio" id="cod" name="metode_bayar" value="cod">
                         <label for="cod">💵 Cash On Delivery (COD)</label>
                         <div class="detail-bayar cod-detail">
-                            <p>**Bayar tunai** saat buah diterima. Berlaku untuk area tertentu.</p>
+                            <p>**Bayar tunai** saat buah diterima. Berlaku untuk area tertentu (Biaya COD: Rp 5.000).</p>
                         </div>
                     </div>
                     
-                    <button type="submit" class="tombol-bayar">Bayar Sekarang</button>
+                    <button type="submit" class="tombol-bayar" disabled id="checkout-button">Bayar Sekarang</button>
+                    <p class="peringatan" id="peringatan-keranjang">**Keranjang kosong.** Silakan pilih produk terlebih dahulu.</p>
                 </form>
             </div>
+        </section>
+
+        <section id="cara-pesan" class="container">
+            <h2>Cara Pemesanan</h2>
+            <ol>
+                <li>Pilih buah yang Anda inginkan dari bagian **Produk**.</li>
+                <li>Klik tombol **Tambah ke Keranjang**.</li>
+                <li>Cek ulang pesanan Anda di bagian **Keranjang & Checkout**.</li>
+                <li>Isi **Informasi Pengiriman** dengan lengkap.</li>
+                <li>Pilih **Metode Pembayaran** yang Anda inginkan.</li>
+                <li>Klik **Bayar Sekarang** dan ikuti instruksi pembayaran.</li>
+            </ol>
         </section>
 
     </main>
 
     <footer id="kontak">
-        <p>&copy; 2025 Toko Buah Segar Online. | Hubungi Kami: 0812-3456-7890</p>
+        <div class="container">
+            <p>&copy; 2025 Toko Buah Segar Online. | Hubungi Kami: **0812-3456-7890**</p>
+        </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const radioButtons = document.querySelectorAll('input[name="metode_bayar"]');
-            const detailContainers = document.querySelectorAll('.detail-bayar');
-
-            // Fungsi untuk menyembunyikan semua detail
-            const hideAllDetails = () => {
-                detailContainers.forEach(detail => detail.style.display = 'none');
-            };
-
-            // Tampilkan detail saat radio button dipilih
-            radioButtons.forEach(radio => {
-                radio.addEventListener('change', (event) => {
-                    hideAllDetails();
-                    const value = event.target.value;
-                    const detailElement = document.querySelector(`.${value}-detail`);
-                    if (detailElement) {
-                        detailElement.style.display = 'block';
-                    }
-                });
-            });
-
-            // Sembunyikan semua saat halaman dimuat
-            hideAllDetails();
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
-<div class="produk-item">
-    <h3>Nama Produk</h3>
-    <p class="harga-produk" data-price="35000">Rp 35.000</p> 
-    <button>Tambah ke Keranjang</button>
-</div>
