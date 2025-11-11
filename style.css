@@ -295,3 +295,28 @@ footer {
 footer p {
     margin: 0;
 }
+
+/* --- PENAMBAHAN UNTUK MENENGAHKAN CARA PEMESANAN --- */
+
+#cara-pesan ol {
+    /* Mengatur lebar maksimum agar daftar tidak melebar penuh,
+       sehingga bisa ditengahkan */
+    max-width: 600px;
+    /* Menengahkan blok daftar (ol) di dalam container */
+    margin: 0 auto;
+    /* Menengahkan teks di dalam list item */
+    text-align: center;
+    /* Memberi padding horizontal agar tidak terlalu mepet */
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#cara-pesan li {
+    /* Pastikan list item tidak terlalu rapat */
+    margin-bottom: 10px;
+    /* Atur teks alignment ke kiri (default) di dalam li
+       agar teks tidak terlihat aneh saat dibungkus baris. */
+    text-align: left;
+    /* Membuat list item sebagai inline-block agar bisa ditengahkan */
+    display: block; 
+}
